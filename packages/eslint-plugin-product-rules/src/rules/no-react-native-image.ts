@@ -1,28 +1,33 @@
-import type { AstNode, RuleModule } from '../types.js';
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '../create-rule.js';
 
-function getImportSpecifierName(specifier: AstNode): string {
+type MessageIds = 'noImport' | 'noUsage';
+type Options = [];
+
+function getImportSpecifierName(specifier: TSESTree.ImportSpecifier): string {
   // 이름을 지정해 가져온 import와 문자열 기반 import 이름을 같은 방식으로 읽습니다.
-  if (specifier.imported.type === 'Identifier') {
+  if (specifier.imported.type === AST_NODE_TYPES.Identifier) {
     return specifier.imported.name;
   }
 
   return specifier.imported.value;
 }
 
-function getJsxName(node: AstNode): string | null {
+function getJsxName(node: TSESTree.JSXTagNameExpression): string | null {
   // JSX 태그 이름을 Image 또는 RN.Image 같은 문자열로 바꿉니다.
-  if (node.type === 'JSXIdentifier') {
+  if (node.type === AST_NODE_TYPES.JSXIdentifier) {
     return node.name;
   }
 
-  if (node.type === 'JSXMemberExpression') {
+  if (node.type === AST_NODE_TYPES.JSXMemberExpression) {
     return `${getJsxName(node.object)}.${getJsxName(node.property)}`;
   }
 
   return null;
 }
 
-const rule: RuleModule = {
+const rule = createRule<Options, MessageIds>({
+  name: 'no-react-native-image',
   meta: {
     // 메타 정보는 룰 설명, 옵션 검증 방식, 메시지 id를 ESLint에 알려주는 영역입니다.
     type: 'problem',
@@ -37,6 +42,7 @@ const rule: RuleModule = {
     },
     schema: []
   },
+  defaultOptions: [],
   create(context) {
     // import에서 찾은 이름을 저장해 두고, 뒤에서 JSX 사용 여부를 검사합니다.
     const imageLocalNames = new Set<string>();
@@ -50,7 +56,10 @@ const rule: RuleModule = {
         }
 
         for (const specifier of node.specifiers) {
-          if (specifier.type === 'ImportSpecifier' && getImportSpecifierName(specifier) === 'Image') {
+          if (
+            specifier.type === AST_NODE_TYPES.ImportSpecifier &&
+            getImportSpecifierName(specifier) === 'Image'
+          ) {
             // import { Image as RNImage }처럼 alias를 쓰면 JSX에는 RNImage가 등장합니다.
             imageLocalNames.add(specifier.local.name);
             context.report({
@@ -59,7 +68,7 @@ const rule: RuleModule = {
             });
           }
 
-          if (specifier.type === 'ImportNamespaceSpecifier') {
+          if (specifier.type === AST_NODE_TYPES.ImportNamespaceSpecifier) {
             // import * as RN 형태는 나중에 <RN.Image />로 쓰일 수 있어 네임스페이스를 저장합니다.
             reactNativeNamespaces.add(specifier.local.name);
           }
@@ -95,6 +104,6 @@ const rule: RuleModule = {
       }
     };
   }
-};
+});
 
 export default rule;

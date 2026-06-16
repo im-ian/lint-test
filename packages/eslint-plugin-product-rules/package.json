@@ -9,5 +9,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
+  },
+  "dependencies": {
+    "@typescript-eslint/utils": "^8.61.1"
   }
 }

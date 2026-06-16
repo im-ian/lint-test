@@ -1,54 +1,58 @@
-import type { AstNode, RuleModule } from '../types.js';
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '../create-rule.js';
+
+type MessageIds = 'noBorder';
+type Options = [];
 
 type StringPart = {
-  node: AstNode;
+  node: TSESTree.Node;
   text: string;
 };
 
-function isClassAttribute(node: AstNode): boolean {
-  return node.name.type === 'JSXIdentifier' && ['className', 'class'].includes(node.name.name);
+function isClassAttribute(node: TSESTree.JSXAttribute): boolean {
+  return node.name.type === AST_NODE_TYPES.JSXIdentifier && ['className', 'class'].includes(node.name.name);
 }
 
-function getStringParts(node: AstNode | null | undefined): StringPart[] {
+function getStringParts(node: TSESTree.Node | null | undefined): StringPart[] {
   // className 안에서 정적으로 알 수 있는 문자열 조각만 모읍니다.
   if (!node) {
     return [];
   }
 
-  if (node.type === 'Literal' && typeof node.value === 'string') {
+  if (node.type === AST_NODE_TYPES.Literal && typeof node.value === 'string') {
     return [{ node, text: node.value }];
   }
 
-  if (node.type === 'TemplateLiteral') {
-    return node.quasis.map((quasi: AstNode) => ({
+  if (node.type === AST_NODE_TYPES.TemplateLiteral) {
+    return node.quasis.map((quasi) => ({
       node: quasi,
       text: quasi.value.cooked ?? quasi.value.raw
     }));
   }
 
-  if (node.type === 'JSXExpressionContainer') {
+  if (node.type === AST_NODE_TYPES.JSXExpressionContainer) {
     return getStringParts(node.expression);
   }
 
-  if (node.type === 'ConditionalExpression') {
+  if (node.type === AST_NODE_TYPES.ConditionalExpression) {
     return [...getStringParts(node.consequent), ...getStringParts(node.alternate)];
   }
 
-  if (node.type === 'LogicalExpression') {
+  if (node.type === AST_NODE_TYPES.LogicalExpression) {
     return [...getStringParts(node.left), ...getStringParts(node.right)];
   }
 
-  if (node.type === 'ArrayExpression') {
-    return node.elements.flatMap((element: AstNode | null) => getStringParts(element));
+  if (node.type === AST_NODE_TYPES.ArrayExpression) {
+    return node.elements.flatMap((element) => getStringParts(element));
   }
 
-  if (node.type === 'CallExpression') {
-    return node.arguments.flatMap((argument: AstNode) => getStringParts(argument));
+  if (node.type === AST_NODE_TYPES.CallExpression) {
+    return node.arguments.flatMap((argument) => getStringParts(argument));
   }
 
-  if (node.type === 'ObjectExpression') {
-    return node.properties.flatMap((property: AstNode) => {
-      if (property.type !== 'Property') {
+  if (node.type === AST_NODE_TYPES.ObjectExpression) {
+    return node.properties.flatMap((property) => {
+      if (property.type !== AST_NODE_TYPES.Property) {
         return [];
       }
 
@@ -96,7 +100,8 @@ function getClassNames(text: string): string[] {
   return text.trim().split(/\s+/).filter(Boolean);
 }
 
-const rule: RuleModule = {
+const rule = createRule<Options, MessageIds>({
+  name: 'no-tailwind-border',
   meta: {
     // React/Tailwind UI에서 경계선 표현을 border 대신 shadow로 통일하기 위한 룰입니다.
     type: 'suggestion',
@@ -109,6 +114,7 @@ const rule: RuleModule = {
     },
     schema: []
   },
+  defaultOptions: [],
   create(context) {
     return {
       JSXAttribute(node) {
@@ -135,6 +141,6 @@ const rule: RuleModule = {
       }
     };
   }
-};
+});
 
 export default rule;

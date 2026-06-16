@@ -1,4 +1,7 @@
-import type { AstNode, RuleModule } from '../types.js';
+import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import { createRule } from '../create-rule.js';
+
+type MessageIds = 'discouragedCopy';
 
 type Pattern = {
   match: string;
@@ -43,9 +46,9 @@ function normalizePattern(pattern: PatternOption): Pattern {
   };
 }
 
-function getPatterns(options: unknown[]): Pattern[] {
+function getPatterns(options: Readonly<RuleOptions>): Pattern[] {
   // eslint.config.mjs의 룰 옵션을 읽고, 없으면 기본 금지 표현을 사용합니다.
-  const configuredPatterns = (options as RuleOptions)[0]?.patterns ?? DEFAULT_PATTERNS;
+  const configuredPatterns = options[0]?.patterns ?? DEFAULT_PATTERNS;
 
   return configuredPatterns.map(normalizePattern);
 }
@@ -55,7 +58,12 @@ function isCheckableText(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function reportMatches(context: Parameters<RuleModule['create']>[0], node: AstNode, text: string, patterns: Pattern[]) {
+function reportMatches(
+  context: Readonly<TSESLint.RuleContext<MessageIds, RuleOptions>>,
+  node: TSESTree.Node,
+  text: string,
+  patterns: Pattern[]
+) {
   // 하나의 문자열 안에 금지 표현이 들어 있는지 확인하고 ESLint 메시지를 만듭니다.
   if (!isCheckableText(text)) {
     return;
@@ -70,17 +78,25 @@ function reportMatches(context: Parameters<RuleModule['create']>[0], node: AstNo
 
     context.report({
       node,
-      message: `Product copy contains discouraged wording "${pattern.match}".${suggestion}`
+      messageId: 'discouragedCopy',
+      data: {
+        match: pattern.match,
+        suggestion
+      }
     });
   }
 }
 
-const rule: RuleModule = {
+const rule = createRule<RuleOptions, MessageIds>({
+  name: 'no-discouraged-copy',
   meta: {
     // suggestion 타입은 코드 스타일이나 문구 개선처럼 권장 성격의 룰에 사용합니다.
     type: 'suggestion',
     docs: {
       description: 'Report product copy that does not match the configured tone.'
+    },
+    messages: {
+      discouragedCopy: 'Product copy contains discouraged wording "{{ match }}".{{ suggestion }}'
     },
     schema: [
       // 스키마는 eslint.config.mjs에 넣을 수 있는 옵션 형태를 제한합니다.
@@ -115,9 +131,10 @@ const rule: RuleModule = {
       }
     ]
   },
-  create(context) {
+  defaultOptions: [{}],
+  create(context, options) {
     // create는 ESLint가 파일 하나를 검사할 때 호출되며, 여기서 AST 방문자를 반환합니다.
-    const patterns = getPatterns(context.options);
+    const patterns = getPatterns(options);
 
     return {
       Literal(node) {
@@ -134,10 +151,12 @@ const rule: RuleModule = {
 
       JSXText(node) {
         // <Text>지금 당장 확인해줘</Text>처럼 JSX 태그 사이에 있는 텍스트를 검사합니다.
-        reportMatches(context, node, node.value, patterns);
+        if (node.type === AST_NODE_TYPES.JSXText) {
+          reportMatches(context, node, node.value, patterns);
+        }
       }
     };
   }
-};
+});
 
 export default rule;
