@@ -1,0 +1,22 @@
+{
+  "name": "lint-test",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "lint:pass": "eslint apps/react-native-case/src/GoodImage.tsx apps/copy-tone-case/src/good-copy.ts apps/copy-tone-case/src/GoodCopyScreen.tsx",
+    "lint:fail-demo": "eslint apps/react-native-case/src/BadImage.tsx apps/copy-tone-case/src/bad-copy.ts apps/copy-tone-case/src/BadCopyScreen.tsx",
+    "test:rules": "node --test \"packages/eslint-plugin-product-rules/tests/*.test.mjs\"",
+    "verify": "npm run test:rules && npm run lint:pass"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "@typescript-eslint/parser": "latest",
+    "eslint": "latest",
+    "typescript": "latest"
+  }
+}

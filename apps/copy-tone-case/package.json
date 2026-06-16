@@ -1,0 +1,6 @@
+{
+  "name": "@lint-test/copy-tone-case",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module"
+}
