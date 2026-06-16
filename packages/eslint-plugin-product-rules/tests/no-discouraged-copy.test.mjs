@@ -21,6 +21,7 @@ const options = [
   }
 ];
 
+// 설정된 금지 표현이 없는 문구는 문제 없이 통과하는지 확인합니다.
 test('allows product copy that matches the configured tone', () => {
   const messages = lint(
     `
@@ -33,6 +34,7 @@ test('allows product copy that matches the configured tone', () => {
   assert.equal(messages.length, 0);
 });
 
+// 일반 문자열 안에 금지 표현이 있으면 표현 개수만큼 보고하는지 확인합니다.
 test('reports discouraged wording in string literals', () => {
   const messages = lint(
     `
@@ -48,6 +50,7 @@ test('reports discouraged wording in string literals', () => {
   ]);
 });
 
+// 백틱으로 만든 템플릿 문자열 안의 금지 표현도 잡는지 확인합니다.
 test('reports discouraged wording in template literals', () => {
   const messages = lint(
     `
@@ -60,6 +63,7 @@ test('reports discouraged wording in template literals', () => {
   assertRuleIds(messages, ['product-rules/no-discouraged-copy']);
 });
 
+// JSX 태그 사이의 화면 문구에 포함된 금지 표현을 잡는지 확인합니다.
 test('reports discouraged wording in JSX text', () => {
   const messages = lint(
     `
