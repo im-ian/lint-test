@@ -1,4 +1,6 @@
-function getImportSpecifierName(specifier) {
+import type { AstNode, RuleModule } from '../types.js';
+
+function getImportSpecifierName(specifier: AstNode): string {
   // 이름을 지정해 가져온 import와 문자열 기반 import 이름을 같은 방식으로 읽습니다.
   if (specifier.imported.type === 'Identifier') {
     return specifier.imported.name;
@@ -7,7 +9,7 @@ function getImportSpecifierName(specifier) {
   return specifier.imported.value;
 }
 
-function getJsxName(node) {
+function getJsxName(node: AstNode): string | null {
   // JSX 태그 이름을 Image 또는 RN.Image 같은 문자열로 바꿉니다.
   if (node.type === 'JSXIdentifier') {
     return node.name;
@@ -20,7 +22,7 @@ function getJsxName(node) {
   return null;
 }
 
-const rule = {
+const rule: RuleModule = {
   meta: {
     // 메타 정보는 룰 설명, 옵션 검증 방식, 메시지 id를 ESLint에 알려주는 영역입니다.
     type: 'problem',
@@ -37,8 +39,8 @@ const rule = {
   },
   create(context) {
     // import에서 찾은 이름을 저장해 두고, 뒤에서 JSX 사용 여부를 검사합니다.
-    const imageLocalNames = new Set();
-    const reactNativeNamespaces = new Set();
+    const imageLocalNames = new Set<string>();
+    const reactNativeNamespaces = new Set<string>();
 
     return {
       ImportDeclaration(node) {

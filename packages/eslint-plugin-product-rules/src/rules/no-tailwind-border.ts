@@ -1,8 +1,15 @@
-function isClassAttribute(node) {
+import type { AstNode, RuleModule } from '../types.js';
+
+type StringPart = {
+  node: AstNode;
+  text: string;
+};
+
+function isClassAttribute(node: AstNode): boolean {
   return node.name.type === 'JSXIdentifier' && ['className', 'class'].includes(node.name.name);
 }
 
-function getStringParts(node) {
+function getStringParts(node: AstNode | null | undefined): StringPart[] {
   // className 안에서 정적으로 알 수 있는 문자열 조각만 모읍니다.
   if (!node) {
     return [];
@@ -13,7 +20,7 @@ function getStringParts(node) {
   }
 
   if (node.type === 'TemplateLiteral') {
-    return node.quasis.map((quasi) => ({
+    return node.quasis.map((quasi: AstNode) => ({
       node: quasi,
       text: quasi.value.cooked ?? quasi.value.raw
     }));
@@ -32,15 +39,15 @@ function getStringParts(node) {
   }
 
   if (node.type === 'ArrayExpression') {
-    return node.elements.flatMap((element) => getStringParts(element));
+    return node.elements.flatMap((element: AstNode | null) => getStringParts(element));
   }
 
   if (node.type === 'CallExpression') {
-    return node.arguments.flatMap((argument) => getStringParts(argument));
+    return node.arguments.flatMap((argument: AstNode) => getStringParts(argument));
   }
 
   if (node.type === 'ObjectExpression') {
-    return node.properties.flatMap((property) => {
+    return node.properties.flatMap((property: AstNode) => {
       if (property.type !== 'Property') {
         return [];
       }
@@ -53,7 +60,7 @@ function getStringParts(node) {
   return [];
 }
 
-function getTailwindBaseClassName(className) {
+function getTailwindBaseClassName(className: string): string {
   // md:hover:border처럼 variant가 붙으면 마지막 콜론 뒤의 실제 utility만 비교합니다.
   let bracketDepth = 0;
   let lastVariantColonIndex = -1;
@@ -79,17 +86,17 @@ function getTailwindBaseClassName(className) {
   return className.slice(lastVariantColonIndex + 1);
 }
 
-function isTailwindBorderClass(className) {
+function isTailwindBorderClass(className: string): boolean {
   const baseClassName = getTailwindBaseClassName(className);
 
   return baseClassName === 'border' || baseClassName.startsWith('border-');
 }
 
-function getClassNames(text) {
+function getClassNames(text: string): string[] {
   return text.trim().split(/\s+/).filter(Boolean);
 }
 
-const rule = {
+const rule: RuleModule = {
   meta: {
     // React/Tailwind UI에서 경계선 표현을 border 대신 shadow로 통일하기 위한 룰입니다.
     type: 'suggestion',

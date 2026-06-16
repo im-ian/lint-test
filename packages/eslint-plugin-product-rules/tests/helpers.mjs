@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { Linter } from 'eslint';
 import tsParser from '@typescript-eslint/parser';
-import productRules from '../index.js';
+import productRules from '../dist/index.js';
 
 export function lint(code, ruleName, ruleOptions = []) {
   const linter = new Linter({ configType: 'flat' });

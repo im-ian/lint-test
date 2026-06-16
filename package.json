@@ -9,9 +9,10 @@
   ],
   "scripts": {
     "ast:examples": "node scripts/ast-examples.mjs",
-    "lint:pass": "eslint apps/react-native-case/src/GoodImage.tsx apps/copy-tone-case/src/good-copy.ts apps/copy-tone-case/src/GoodCopyScreen.tsx apps/react-tailwind-case/src/GoodTailwindCard.tsx",
-    "lint:fail-demo": "eslint apps/react-native-case/src/BadImage.tsx apps/copy-tone-case/src/bad-copy.ts apps/copy-tone-case/src/BadCopyScreen.tsx apps/react-tailwind-case/src/BadTailwindCard.tsx",
-    "test:rules": "node --test \"packages/eslint-plugin-product-rules/tests/*.test.mjs\"",
+    "build:plugin": "tsc -p packages/eslint-plugin-product-rules/tsconfig.json",
+    "lint:pass": "npm run build:plugin && eslint apps/react-native-case/src/GoodImage.tsx apps/copy-tone-case/src/good-copy.ts apps/copy-tone-case/src/GoodCopyScreen.tsx apps/react-tailwind-case/src/GoodTailwindCard.tsx",
+    "lint:fail-demo": "npm run build:plugin && eslint apps/react-native-case/src/BadImage.tsx apps/copy-tone-case/src/bad-copy.ts apps/copy-tone-case/src/BadCopyScreen.tsx apps/react-tailwind-case/src/BadTailwindCard.tsx",
+    "test:rules": "npm run build:plugin && node --test \"packages/eslint-plugin-product-rules/tests/*.test.mjs\"",
     "verify": "npm run test:rules && npm run lint:pass"
   },
   "devDependencies": {

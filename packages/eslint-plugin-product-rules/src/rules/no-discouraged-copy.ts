@@ -1,4 +1,22 @@
-const DEFAULT_PATTERNS = [
+import type { AstNode, RuleModule } from '../types.js';
+
+type Pattern = {
+  match: string;
+  suggest: string | null;
+};
+
+type PatternOption = string | {
+  match: string;
+  suggest?: string;
+};
+
+type RuleOptions = [
+  {
+    patterns?: PatternOption[];
+  }?
+];
+
+const DEFAULT_PATTERNS: PatternOption[] = [
   // 설정에서 patterns를 넘기지 않았을 때 사용하는 기본 금지 표현입니다.
   {
     match: '해줘',
@@ -10,7 +28,7 @@ const DEFAULT_PATTERNS = [
   }
 ];
 
-function normalizePattern(pattern) {
+function normalizePattern(pattern: PatternOption): Pattern {
   // 사용자가 문자열만 넘겨도 { match, suggest } 형태처럼 다룰 수 있게 맞춥니다.
   if (typeof pattern === 'string') {
     return {
@@ -25,19 +43,19 @@ function normalizePattern(pattern) {
   };
 }
 
-function getPatterns(options) {
+function getPatterns(options: unknown[]): Pattern[] {
   // eslint.config.mjs의 룰 옵션을 읽고, 없으면 기본 금지 표현을 사용합니다.
-  const configuredPatterns = options[0]?.patterns ?? DEFAULT_PATTERNS;
+  const configuredPatterns = (options as RuleOptions)[0]?.patterns ?? DEFAULT_PATTERNS;
 
   return configuredPatterns.map(normalizePattern);
 }
 
-function isCheckableText(value) {
+function isCheckableText(value: unknown): value is string {
   // 비어 있는 문자열이나 문자열이 아닌 값은 검사하지 않습니다.
   return typeof value === 'string' && value.trim().length > 0;
 }
 
-function reportMatches(context, node, text, patterns) {
+function reportMatches(context: Parameters<RuleModule['create']>[0], node: AstNode, text: string, patterns: Pattern[]) {
   // 하나의 문자열 안에 금지 표현이 들어 있는지 확인하고 ESLint 메시지를 만듭니다.
   if (!isCheckableText(text)) {
     return;
@@ -57,7 +75,7 @@ function reportMatches(context, node, text, patterns) {
   }
 }
 
-const rule = {
+const rule: RuleModule = {
   meta: {
     // suggestion 타입은 코드 스타일이나 문구 개선처럼 권장 성격의 룰에 사용합니다.
     type: 'suggestion',

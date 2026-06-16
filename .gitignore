@@ -1,3 +1,4 @@
 node_modules/
+packages/eslint-plugin-product-rules/dist/
 npm-debug.log*
 .DS_Store

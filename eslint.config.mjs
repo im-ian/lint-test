@@ -1,6 +1,6 @@
 import js from '@eslint/js';
 import tsParser from '@typescript-eslint/parser';
-import productRules from './packages/eslint-plugin-product-rules/index.js';
+import productRules from './packages/eslint-plugin-product-rules/dist/index.js';
 
 export default [
   {
