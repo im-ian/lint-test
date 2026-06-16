@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    "ast:examples": "node scripts/ast-examples.mjs",
     "lint:pass": "eslint apps/react-native-case/src/GoodImage.tsx apps/copy-tone-case/src/good-copy.ts apps/copy-tone-case/src/GoodCopyScreen.tsx",
     "lint:fail-demo": "eslint apps/react-native-case/src/BadImage.tsx apps/copy-tone-case/src/bad-copy.ts apps/copy-tone-case/src/BadCopyScreen.tsx",
     "test:rules": "node --test \"packages/eslint-plugin-product-rules/tests/*.test.mjs\"",
