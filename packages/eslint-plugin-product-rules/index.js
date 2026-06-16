@@ -1,5 +1,6 @@
 import noDiscouragedCopy from './rules/no-discouraged-copy.js';
 import noReactNativeImage from './rules/no-react-native-image.js';
+import noTailwindBorder from './rules/no-tailwind-border.js';
 
 const plugin = {
   meta: {
@@ -8,7 +9,8 @@ const plugin = {
   },
   rules: {
     'no-discouraged-copy': noDiscouragedCopy,
-    'no-react-native-image': noReactNativeImage
+    'no-react-native-image': noReactNativeImage,
+    'no-tailwind-border': noTailwindBorder
   }
 };
 

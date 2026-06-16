@@ -27,6 +27,7 @@ export default [
     },
     rules: {
       'product-rules/no-react-native-image': 'error',
+      'product-rules/no-tailwind-border': 'error',
       'product-rules/no-discouraged-copy': [
         'warn',
         {
