@@ -1,5 +1,7 @@
 import { Text } from 'react-native';
 
-export function GoodCopyScreen() {
-  return <Text>지금 다시 시도해 주세요.</Text>;
+type Translator = (key: string) => string;
+
+export function GoodCopyScreen({ t }: { t: Translator }) {
+  return <Text>{t('retry.message')}</Text>;
 }

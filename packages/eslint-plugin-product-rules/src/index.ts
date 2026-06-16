@@ -1,4 +1,5 @@
 import noDiscouragedCopy from './rules/no-discouraged-copy.js';
+import noHardcodedI18nText from './rules/no-hardcoded-i18n-text.js';
 import noReactNativeImage from './rules/no-react-native-image.js';
 import noTailwindBorder from './rules/no-tailwind-border.js';
 
@@ -9,6 +10,7 @@ const plugin = {
   },
   rules: {
     'no-discouraged-copy': noDiscouragedCopy,
+    'no-hardcoded-i18n-text': noHardcodedI18nText,
     'no-react-native-image': noReactNativeImage,
     'no-tailwind-border': noTailwindBorder
   }

@@ -1,12 +1,14 @@
 import { Text, View } from 'react-native';
 import { AppImage } from './design-system/Image';
 
-export function GoodImageExample() {
+type Translator = (key: string) => string;
+
+export function GoodImageExample({ t }: { t: Translator }) {
   return (
     <View>
-      <Text>프로필 이미지</Text>
+      <Text>{t('profile.image.label')}</Text>
       <AppImage
-        accessibilityLabel="프로필 사진"
+        accessibilityLabel={t('profile.image.accessibilityLabel')}
         source={{ uri: 'https://example.com/profile.png' }}
       />
     </View>

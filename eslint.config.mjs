@@ -26,6 +26,7 @@ export default [
       'product-rules': productRules
     },
     rules: {
+      'product-rules/no-hardcoded-i18n-text': 'error',
       'product-rules/no-react-native-image': 'error',
       'product-rules/no-tailwind-border': 'error',
       'product-rules/no-discouraged-copy': [
