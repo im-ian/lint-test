@@ -108,3 +108,47 @@ test('ignores non-user-facing attributes and non-text-only children', () => {
 
   assert.equal(messages.length, 0);
 });
+
+// 공백, 구분자, 기호만 있는 JSX 텍스트와 속성 값은 번역 대상 문구로 보지 않는지 확인합니다.
+test('allows whitespace and punctuation-only text', () => {
+  const messages = lint(
+    `
+      export function Separators() {
+        return (
+          <nav aria-label="+" title="...">
+            {' '}
+            <span>·</span>
+            <span>/</span>
+            <span>{'—'}</span>
+            <span>{\`...\`}</span>
+          </nav>
+        );
+      }
+    `,
+    'no-hardcoded-i18n-text'
+  );
+
+  assert.equal(messages.length, 0);
+});
+
+// 문구에 특수기호가 섞여 있어도 글자가 포함되어 있으면 하드코딩 문구로 잡는지 확인합니다.
+test('reports hardcoded text even when it contains punctuation', () => {
+  const messages = lint(
+    `
+      export function Status() {
+        return (
+          <>
+            <strong>완료!</strong>
+            <input placeholder="Search..." />
+          </>
+        );
+      }
+    `,
+    'no-hardcoded-i18n-text'
+  );
+
+  assertRuleIds(messages, [
+    'product-rules/no-hardcoded-i18n-text',
+    'product-rules/no-hardcoded-i18n-text'
+  ]);
+});

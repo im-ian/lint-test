@@ -41,6 +41,7 @@ npm run lint:fail-demo
 `packages/eslint-plugin-product-rules/src/rules/no-tailwind-border.ts`는 React `className` 안의 `border`, `border-*`, `md:hover:border` 같은 Tailwind border 클래스를 잡습니다. 시각적 경계는 `shadow-*` 또는 arbitrary shadow utility로 표현하도록 안내합니다.
 
 `packages/eslint-plugin-product-rules/src/rules/no-hardcoded-i18n-text.ts`는 JSX 화면 문구와 `placeholder`, `aria-label`, `alt`, `accessibilityLabel`, `title` 같은 사용자 노출 속성의 하드코딩 문자열을 잡습니다.
+공백, 숫자, `·`, `/`, `—`, `...`처럼 글자가 없는 구분자/기호-only 값은 허용합니다.
 
 `docs/ast-examples.md`와 `scripts/ast-examples.mjs`는 룰이 참고하는 AST 노드를 학습용으로 보여줍니다.
 
